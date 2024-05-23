@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "844428909467",
+    "firebase_url": "https://quanlychitieu-cbbb0-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "quanlychitieu-cbbb0",
+    "storage_bucket": "quanlychitieu-cbbb0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844428909467:android:5db9fa517866d4a43fdf3e",
+        "android_client_info": {
+          "package_name": "com.example.expensemanagerapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBL7x06ipKB75GrG_jSGYB-P97NK4EFCqI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
