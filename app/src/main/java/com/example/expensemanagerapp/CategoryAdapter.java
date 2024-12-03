@@ -26,7 +26,7 @@ public class CategoryAdapter extends ArrayAdapter<Category> {
 
         Category category=this.getItem(position);
         if(category!=null){
-            tvSeleted.setText(category.getName());
+            tvSeleted.setText(category.getMonthName());
         }
 
         return convertView;
@@ -40,7 +40,7 @@ public class CategoryAdapter extends ArrayAdapter<Category> {
 
         Category category=this.getItem(position);
         if(category!=null){
-            tvCategory.setText(category.getName());
+            tvCategory.setText(category.getMonthName());
         }
 
         return convertView;

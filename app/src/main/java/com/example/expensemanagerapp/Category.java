@@ -1,16 +1,22 @@
 package com.example.expensemanagerapp;
 
 public class Category {
-    private String name;
-    public Category(String name){
-        this.name=name;
+    private String monthName;
+
+    public Category(String monthName) {
+        this.monthName = monthName;
     }
 
-    public String getName() {
-        return name;
+    public String getMonthName() {
+        return monthName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setMonthName(String monthName) {
+        this.monthName = monthName;
+    }
+
+    @Override
+    public String toString() {
+        return monthName;  // This will ensure that the Spinner displays the month name
     }
 }

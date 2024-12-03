@@ -119,10 +119,10 @@
                     android:layout_height="wrap_content">
                     <Button
                         android:layout_width="match_parent"
-                        android:text="CANCEL"
+                        android:text="Hủy"
                         android:textAppearance="?android:textAppearanceMedium"
                         android:textColor="@color/white"
-                        android:background="@color/nav_header"
+                        android:background="@drawable/rounded_background"
                         android:id="@+id/btnCancel"
                         android:layout_height="wrap_content"/>
                 </RelativeLayout>
@@ -135,10 +135,10 @@
                     android:layout_height="wrap_content">
                     <Button
                         android:layout_width="match_parent"
-                        android:text="SAVE"
+                        android:text="Thêm"
                         android:textAppearance="?android:textAppearanceMedium"
                         android:textColor="@color/white"
-                        android:background="@color/nav_header"
+                        android:background="@drawable/rounded_background"
                         android:id="@+id/btnSave"
                         android:layout_height="wrap_content"/>
                 </RelativeLayout>

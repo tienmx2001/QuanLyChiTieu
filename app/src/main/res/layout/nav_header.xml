@@ -5,16 +5,17 @@
     android:layout_width="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="@color/nav_header"
+    android:background="@drawable/background_color"
     app:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:layout_height="200dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Expense Manager"
+        android:text="Quản lí chi tiêu"
         android:textAppearance="?android:textAppearanceMedium"
         android:gravity="center"
-        android:textColor="@color/white"/>
+        android:textColor="@color/white"
+        />
 
 </LinearLayout>

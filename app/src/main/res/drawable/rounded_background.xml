@@ -1,0 +1,6 @@
+<!-- res/drawable/rounded_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/nav_header" /> <!-- Màu nền của LinearLayout -->
+    <corners android:radius="100dp" /> <!-- Bán kính bo góc -->
+    <stroke android:width="0dp" android:color="#000" /> <!-- Đường viền (nếu cần) -->
+</shape>

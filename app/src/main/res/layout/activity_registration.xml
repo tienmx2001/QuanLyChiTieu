@@ -16,13 +16,20 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center">
+
             <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registration"
+            android:text="Đăng Kí "
             android:textColor="@color/white"
             android:textAppearance="?android:textAppearanceLarge"
-            android:gravity="center"/>
+            android:gravity="center" />
+            <ImageView
+                android:id="@+id/myImageView"
+                android:layout_width="300dp"
+                android:layout_height="200dp"
+                android:src="@drawable/saving_icon"
+                />
             <EditText
 
                 android:layout_width="match_parent"
@@ -53,7 +60,7 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginRight="100dp"
                 android:layout_marginLeft="100dp"
-                android:text="Registration"
+                android:text="Sign Up"
                 android:textColor="@color/white"
                 android:background="@drawable/button_background"
                 android:id="@+id/btn_reg"/>
@@ -64,7 +71,7 @@
                 android:gravity="center"
                 android:id="@+id/signin_here"
                 android:text="Already have account? Sign In here"
-                android:textColor="@color/white"
+                android:textColor="#736F73"
                 android:padding="5dp"/>
 
 

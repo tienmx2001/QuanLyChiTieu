@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,161 +40,153 @@ import java.util.List;
  */
 public class StatisticsFragment extends Fragment {
 
+
     private FirebaseAuth mAuth;
     private DatabaseReference mIncomeDatabase;
     private DatabaseReference mExpenseDatabase;
-    ArrayList<Data> list;
+    ArrayList<Data> incomeList, expenseList;
 
     private Spinner spnCategory;
     private CategoryAdapter categoryAdapter;
-    //
+
     private TextView incomTotalSum;
     private TextView expenseTotalSum;
+
+    private RecyclerView recyclerIncome, recyclerExpense;
+    private InComeAdapter incomeAdapter;
+    private ExpenseAdapter expenseAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
-
-        View myview= inflater.inflate(R.layout.fragment_statistics, container, false);
-
+        View myview = inflater.inflate(R.layout.fragment_statistics, container, false);
 
         mAuth = FirebaseAuth.getInstance();
-
         FirebaseUser mUser = mAuth.getCurrentUser();
         String uid = mUser.getUid();
-        mIncomeDatabase = FirebaseDatabase.getInstance().getReference().child("IncomeData").child(uid);
-        incomTotalSum=myview.findViewById(R.id.income_set_result);
 
+        mIncomeDatabase = FirebaseDatabase.getInstance().getReference().child("IncomeData").child(uid);
         mExpenseDatabase = FirebaseDatabase.getInstance().getReference().child("ExpenseDatabase").child(uid);
+
+        incomTotalSum = myview.findViewById(R.id.income_set_result);
         expenseTotalSum = myview.findViewById(R.id.expense_set_result);
 
-        list =  new ArrayList<>();
+        recyclerIncome = myview.findViewById(R.id.recycler_income);
+        recyclerExpense = myview.findViewById(R.id.recycler_expense);
+
+        incomeList = new ArrayList<>();
+        expenseList = new ArrayList<>();
+
+        incomeAdapter = new InComeAdapter(getContext(), incomeList);
+        expenseAdapter = new ExpenseAdapter(getContext(), expenseList);
+
+        recyclerIncome.setAdapter(incomeAdapter);
+        recyclerExpense.setAdapter(expenseAdapter);
+
+        recyclerIncome.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerExpense.setLayoutManager(new LinearLayoutManager(getContext()));
 
         spnCategory = myview.findViewById(R.id.spn_category);
-        categoryAdapter= new CategoryAdapter(getActivity(),R.layout.item_spinner_selected,getListCategory());
+        categoryAdapter = new CategoryAdapter(getActivity(), R.layout.item_spinner_selected, getListCategory());
         spnCategory.setAdapter(categoryAdapter);
+
         spnCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                Integer selectedMonth = Integer.valueOf(position + 1); // Vị trí bắt đầu từ 0, nên cộng thêm 1
-                // Gọi phương thức để xử lý dữ liệu dựa trên tháng đã chọn
-                if(selectedMonth==11){
-                    handleDataForSelectedMonth(selectedMonth);
-                }
-                else{
-                    order1(selectedMonth);
-                }
+                int selectedMonth = position + 1; // Position starts at 0, so add 1 to get month (1-12)
+                loadIncomeData(selectedMonth);
+                loadExpenseData(selectedMonth);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
+
         return myview;
     }
-    private List<Category> getListCategory(){
-        List<Category> list = new ArrayList<>();
-        list.add(new Category("Tháng 1"));
-        list.add(new Category("Tháng 2"));
-        list.add(new Category("Tháng 3"));
-        list.add(new Category("Tháng 4"));
-        list.add(new Category("Tháng 5"));
-        list.add(new Category("Tháng 6"));
-        list.add(new Category("Tháng 7"));
-        list.add(new Category("Tháng 8"));
-        list.add(new Category("Tháng 9"));
-        list.add(new Category("Tháng 10"));
-        list.add(new Category("Tháng 11"));
-        list.add(new Category("Tháng 12"));
 
-        return list;
-    }
-    private void order1(Integer Month){
-        String result = "Tháng " + Month + ": " +  "0đ";
-        incomTotalSum.setText(result);
-
-
-        String result1 = "Tháng " + Month + ": " +  "0đ";
-        expenseTotalSum.setText(result1);
-
-    }
-
-    private void handleDataForSelectedMonth(Integer selectedMonth) {
-//        Date startDate = new Date();
-//        Date endDate = new Date();
-//
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        String startDateStr = dateFormat.format(startDate);
-//        String endDateStr = dateFormat.format(endDate);
-//        Query query = mIncomeDatabase
-//                .orderByChild("date")
-//                .startAt(startDateStr)
-//                .endAt(endDateStr);
-//        Query query = mIncomeDatabase
-//                .orderByChild("date")
-//                .startAt("1 " + "thg "+selectedMonth + ", 2023" )
-//                .endAt("31 " + "thg "+selectedMonth + ", 2023" );
-
-        mIncomeDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void loadIncomeData(int month) {
+        Query incomeQuery = mIncomeDatabase.orderByChild("date");
+        incomeQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int totalIncomeForMonth = 0;
-
-                for (DataSnapshot mysnapshot : snapshot.getChildren()) {
-                    Data data = mysnapshot.getValue(Data.class);
-                    totalIncomeForMonth += data.getAmount();
-                    // Hiển thị tổng thu nhập của tháng đã chọn
-                    String formattedTotalSum = formatNumberWithCommas(totalIncomeForMonth);
-                    String result = "Tháng " + selectedMonth + ": " + formattedTotalSum + "đ";
-                    incomTotalSum.setText(result);
+                double totalIncome = 0;
+                incomeList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Data data = dataSnapshot.getValue(Data.class);
+                    String dateString = data.getDate(); // Assume date is in "d 'thg' M, yyyy" format
+                    try {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("d 'thg' M, yyyy", Locale.forLanguageTag("vi-VN"));
+                        Date date = dateFormat.parse(dateString);
+                        if (new SimpleDateFormat("MM").format(date).equals(String.valueOf(month))) {
+                            totalIncome += data.getAmount(); // Sum amounts for the selected month
+                            incomeList.add(data); // Add the data to list for displaying in RecyclerView
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-
-
-                // Đưa kết quả hiển thị lên giao diện người dùng
-
-
+                incomTotalSum.setText(new DecimalFormat("#,###.##").format(totalIncome)); // Display formatted total
+                incomeAdapter.notifyDataSetChanged(); // Update RecyclerView
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(getContext(), "Failed to load income data", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
-
-//        Query query1 = mExpenseDatabase
-//                .orderByChild("date")
-//                .startAt("1 " + "thg "+selectedMonth + ", 2023" )
-//                .endAt("31 " + "thg "+selectedMonth + ", 2023" );
-        mExpenseDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void loadExpenseData(int month) {
+        Query expenseQuery = mExpenseDatabase.orderByChild("date");
+        expenseQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int totalIncomeForMonth = 0;
-
-                for (DataSnapshot mysnapshot : snapshot.getChildren()) {
-                    Data data = mysnapshot.getValue(Data.class);
-                    totalIncomeForMonth += data.getAmount();
-                    // Hiển thị tổng thu nhập của tháng đã chọn
-                    String formattedTotalSum = formatNumberWithCommas(totalIncomeForMonth);
-                    String result = "Tháng " + selectedMonth + ": " + formattedTotalSum + "đ";
-                    // Đưa kết quả hiển thị lên giao diện người dùng
-                    expenseTotalSum.setText(result);
+                double totalExpense = 0;
+                expenseList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Data data = dataSnapshot.getValue(Data.class);
+                    String dateString = data.getDate(); // Assume date is in "d 'thg' M, yyyy" format
+                    try {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("d 'thg' M, yyyy", Locale.forLanguageTag("vi-VN"));
+                        Date date = dateFormat.parse(dateString);
+                        if (new SimpleDateFormat("MM").format(date).equals(String.valueOf(month))) {
+                            totalExpense += data.getAmount(); // Sum amounts for the selected month
+                            expenseList.add(data); // Add the data to list for displaying in RecyclerView
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-
+                expenseTotalSum.setText(new DecimalFormat("#,###.##").format(totalExpense)); // Display formatted total
+                expenseAdapter.notifyDataSetChanged(); // Update RecyclerView
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(getContext(), "Failed to load expense data", Toast.LENGTH_SHORT).show();
             }
         });
     }
-    private String formatNumberWithCommas(int number) {
-        DecimalFormat decimalFormat = new DecimalFormat("#,###");
-        return decimalFormat.format(number);
+
+
+    // Method to return list of months
+    private List<Category> getListCategory() {
+        List<Category> categories = new ArrayList<>();
+        categories.add(new Category("January"));
+        categories.add(new Category("February"));
+        categories.add(new Category("March"));
+        categories.add(new Category("April"));
+        categories.add(new Category("May"));
+        categories.add(new Category("June"));
+        categories.add(new Category("July"));
+        categories.add(new Category("August"));
+        categories.add(new Category("September"));
+        categories.add(new Category("October"));
+        categories.add(new Category("November"));
+        categories.add(new Category("December"));
+        return categories;
     }
 }

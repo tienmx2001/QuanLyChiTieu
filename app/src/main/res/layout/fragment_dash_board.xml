@@ -33,7 +33,7 @@
                         android:textAppearance="?android:textAppearanceLarge"
                         android:textColor="#0888EE"
                         android:textStyle="bold"
-                        android:text="Thu nhập"/>
+                        android:text="Tổng thu"/>
 
                 </RelativeLayout>
 
@@ -48,7 +48,7 @@
                         android:textAppearance="?android:textAppearanceLarge"
                         android:textColor="@color/holo_red"
                         android:textStyle="bold"
-                        android:text="Chi tiêu"/>
+                        android:text="Tổng chi"/>
 
                 </RelativeLayout>
             </LinearLayout>
